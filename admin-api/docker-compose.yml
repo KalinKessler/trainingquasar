@@ -1,0 +1,60 @@
+version: '3.9'
+
+networks:
+  admin-network:
+    driver: bridge
+
+volumes:
+  pgsql_data:
+
+services:
+  db:
+    image: postgres:16.1-alpine
+    container_name: admin-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+    ports:
+      - 5432:${DB_PORT:-5432}
+    volumes:
+      - pgsql_data:/var/lib/postgresql/data
+      - ./.docker/postgres/init:/docker-entrypoint-initdb.d/
+      - ./.docker/postgres/postgres.conf:/etc/postgresql.conf
+    networks:
+      - admin-network
+  php:
+    build:
+      args:
+          user: admin-user
+          uid: 1000
+      context: .docker
+      dockerfile: Dockerfile
+    image: admin-php
+    container_name: admin-ci4
+    restart: unless-stopped
+    tty: true
+    depends_on:
+      - db
+      # environment:
+      # DATABASE_URL: postgresql://${DB_USERNAME}:${DB_PASSWORD}@127.0.0.1:5432/${DB_DATABASE}
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - admin-network
+  nginx:
+    image: nginx:1.17-alpine
+    container_name: admin-nginx
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    depends_on:
+      - php
+    volumes:
+      - ./:/var/www
+      - ./.docker/nginx:/etc/nginx/conf.d
+    networks:
+      - admin-network
+
