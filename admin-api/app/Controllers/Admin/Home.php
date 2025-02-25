@@ -29,7 +29,7 @@ class Home extends BaseController
                 'id' => $dataRow->admin_uuid,
                 'name' => $dataRow->admin_name,
                 'email' => $dataRow->admin_email,
-                'status' => $dataRow->admin_status
+                'status' => $dataRow->status
             ]);
         }
         return $this->respond([
@@ -52,6 +52,10 @@ class Home extends BaseController
             'password' => [
                 'label' => 'Admin password',
                 'rules' => 'required|string'
+            ],
+            'roles' => [
+                'label' => 'Admin roles',
+                'rules' => 'required'
             ],
         ]);
 
@@ -110,7 +114,7 @@ class Home extends BaseController
             return $this->fail(['message' => 'Admin not found']);
         }
 
-        $postData = $this->request->getJSON(); // put ambilnya pake getwarinput
+        $postData = $this->request->getJSON(); // put ambilnya pake getrawinput
 
         $this->validation->setRules([
             'name' => [

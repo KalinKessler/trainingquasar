@@ -68,6 +68,10 @@ class InitialDatabase extends Migration
             'type'       => 'VARCHAR',
             'constraint' => 36,
         ],
+        'role_code' => [
+            'type'       => 'CHAR',
+            'constraint' => 2,
+        ],
         'created_at' => [
             'type' => 'DATETIME',
         ],
@@ -91,6 +95,10 @@ class InitialDatabase extends Migration
         'role_id' => [
             'type'     => 'BIGINT',
         ],
+        'role_code' => [
+            'type'       => 'CHAR',
+            'constraint' => 2,
+        ],
         'created_at' => [
             'type' => 'DATETIME',
         ],
@@ -103,7 +111,7 @@ class InitialDatabase extends Migration
         ],
     ]);
 
-    $this->forge->addKey(['admin_id', 'role_id'], true);
+    $this->forge->addKey(['admin_id'], true);
 
     $this->forge->createTable('admin_role_ms');
 }
